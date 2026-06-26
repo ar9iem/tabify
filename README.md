@@ -2,7 +2,7 @@
 
 Tabify is a lightweight, efficient Obsidian plugin that lets you organize dense note content into clean, interactive tabbed containers. By utilizing a simple markdown code block syntax, you can seamlessly slice up long text, code snippets, or notes without cluttering your workspace visual layout.
 
-![Tabify Showcase](https://raw.githubusercontent.com/your-github-username/obsidian-tabify/main/images/showcase.gif)
+![Tabify Showcase](./images/tabify_1.png)
 
 ## Features
 
