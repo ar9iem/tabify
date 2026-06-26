@@ -6,3 +6,32 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.custom-tabs-container {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    margin: 1em 0;
+    overflow: hidden;
+}
+.tab-header-bar {
+    display: flex;
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-radius: 0;
+}
+.tab-btn.active {
+    color: var(--text-normal);
+    background-color: var(--background-primary);
+    border-bottom: 2px solid var(--interactive-accent);
+    font-weight: bold;
+}
+.tab-content-area {
+    padding: 12px;
+    background-color: var(--background-primary);
+}

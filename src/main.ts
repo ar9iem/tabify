@@ -1,114 +1,64 @@
-import {
-	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
-	Modal,
-	Notice,
-	Plugin,
-} from 'obsidian';
-import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-	SampleSettingTab,
-} from './settings';
+import { Plugin, MarkdownPostProcessorContext } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
+export default class ArniemTabsPlugin extends Plugin {
+    async onload() {
+        console.log("Loading Arniem's Custom Tabs...");
 
-export default class MyPlugin extends Plugin {
-	settings!: MyPluginSettings;
+        // Note the capital 'B' in registerMarkdownCodeBlockProcessor
+        this.registerMarkdownCodeBlockProcessor("tabs", (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+            
+            // 1. Create a root container wrapper
+            const container = el.createDiv({ cls: "custom-tabs-container" });
+            
+            // 2. Parse the lines inside your markdown code block
+            const lines: string[] = source.split("\n").filter((line: string) => line.trim() !== "");
+            
+            // Basic structural arrays
+            const tabTitles: string[] = [];
+            const tabContents: string[] = [];
 
-	async onload() {
-		await this.loadSettings();
+            // A basic layout parser
+            let currentContent = "";
+            lines.forEach((line: string) => {
+                if (line.startsWith("=== ")) {
+                    if (tabTitles.length > 0) tabContents.push(currentContent);
+                    tabTitles.push(line.replace("=== ", "").trim());
+                    currentContent = "";
+                } else {
+                    currentContent += line + "\n";
+                }
+            });
+            if (tabTitles.length > 0) tabContents.push(currentContent);
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+            // 3. Render the Tab Headers
+            const headerBar = container.createDiv({ cls: "tab-header-bar" });
+            const contentArea = container.createDiv({ cls: "tab-content-area" });
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+            tabTitles.forEach((title: string, index: number) => {
+                const tabButton = headerBar.createEl("button", { 
+                    text: title, 
+                    cls: index === 0 ? "tab-btn active" : "tab-btn" 
+                });
+                
+                const tabPane = contentArea.createDiv({ 
+                    text: tabContents[index], 
+                    cls: "tab-pane" 
+                });
+                if (index !== 0) tabPane.style.display = "none";
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				editor.replaceSelection('Sample editor command');
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+                // Simple vanilla DOM toggle event logic
+                tabButton.addEventListener("click", () => {
+                    headerBar.querySelectorAll(".tab-btn").forEach((b: Element) => b.classList.remove("active"));
+                    contentArea.querySelectorAll(".tab-pane").forEach((p: Element) => (p as HTMLElement).style.display = "none");
+                    
+                    tabButton.classList.add("active");
+                    tabPane.style.display = "block";
+                });
+            });
+        });
+    }
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			},
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
-	}
-
-	onunload() {}
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
+    onunload() {
+        console.log("Unloading Arniem's Custom Tabs...");
+    }
 }
