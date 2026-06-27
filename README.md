@@ -4,6 +4,8 @@ Tabify is a lightweight, efficient Obsidian plugin that lets you organize dense 
 
 ![Tabify Showcase](./images/tabify_1.png)
 
+![1782535063776](image/README/1782535063776.gif)
+
 ## Features
 
 * **Inline Tabbed Containers:** Group relevant content tightly together inside a single note view.
